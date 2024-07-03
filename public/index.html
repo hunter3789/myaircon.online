@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Aircon</title>
+  <link rel="icon" type="image/png" href="./favicon.ico"></link>
 </head>
 
 <body style="margin: 0;" >
@@ -16,18 +17,11 @@
     </div>
     <div class="who-alert"><p></p></div>
     <div class="who"><p></p></div>
-    <img src="/aircon0.png" class="aircon">
-    <img src="/aircon-fan2.png" class="aircon aircon-fan">
-    <img src="/air2.png" class="aircon air">
+    <img src="./aircon0.png" class="aircon">
+    <img src="./aircon-fan2.png" class="aircon aircon-fan">
+    <img src="./air2.png" class="aircon air">
   </div>
 
-
-  <div class="modal">
-    <div class="modal-inner">
-      <input placeholder="nickname" maxlength="9">
-      <button class="ok">OK</button>
-    </div>
-  </div>
 
   <div class="aircon-box">
 
@@ -39,10 +33,6 @@
     <button class="brown-noise2"></button>
 
   </div>
-  <div class="aircon-box" style="margin-top: 20px;">
-    <button class="real-time">Online mode is off</button>
-  </div>
-
   
   
   <!-- stats and about -->
@@ -97,7 +87,7 @@
   </script>
 
 
-  <script src="/brown-run.js"></script>
+  <script src="./brown-run.js"></script>
 
 
   <style>
@@ -174,7 +164,7 @@
     }
 
     .flip {
-      transition: transform 1s;
+      #transition: transform 1s;
       transform: translateY(114px) scaleY(-1);
     }
 
@@ -219,10 +209,6 @@
   </style>
 
 
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
-    integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
-    crossorigin="anonymous"></script>
-
   <script>
 
     var tempElement = document.querySelector('.temp')
@@ -235,18 +221,7 @@
 
     var socket;
 
-
-
-    var username = ''
-    document.querySelector('.ok').addEventListener('click', () => {
-      //save name
-      username = document.querySelector('input').value
-      document.querySelector('.modal').style.display = 'none'
-
-      turnOn()
-    })
-
-
+    turnOn();
 
     function turnOn() {
        
@@ -257,6 +232,8 @@
       //animation
       document.querySelector('.aircon-fan').classList.add('flip')
       document.querySelector('.air').classList.add('air-animate')
+
+      tempElement.innerHTML = currentTemp + '℃';
 
       //+- buttons
       document.querySelector('.plus').addEventListener('click', () => {
@@ -283,64 +260,6 @@
       })
 
     }
-
-
-
-    //real time mode on/off button
-    document.querySelector('.real-time').addEventListener('click', function(){
-
-      if (!socket){
-        socket = io({transports: ["websocket"]});
-        socket.on("connect", () => {
-          socket.on("init", (data) => {
-            document.querySelector('.temp').innerHTML = data + '℃'
-            currentTemp = data;
-          });
-
-        })
-      }
-      
-
-      //if currently not online
-      if (isOnline == false){
-        isOnline = true
-        document.querySelector('.real-time').classList.add('rainbow');
-
-
-        //starts listening to server
-        socket.on("blocked", (data) => {
-          whoAlertElement.innerHTML = '<p>같은 IP의 과도한 요청으로 미반영</p>';
-        });
-        socket.on("tempChange", (data) => {
-          //{temp : temp, username : arg}
-          tempElement.innerHTML = data.temp + '℃';
-          whoElement.innerHTML = '<p></p>'
-          whoElement.children[0].innerText = '조절한 사람: ' + data.username;
-          currentTemp = data.temp;
-
-          if (isOnline == true && isSoundOn == true){
-            realTimeGain()
-          }
-        })
-        document.querySelector('.real-time').innerHTML = "Online mode is on"
-
-
-      //if currently online
-      } else {
-        isOnline = false
-        document.querySelector('.real-time').classList.remove('rainbow')
-
-        //stop listening to server
-        socket.off('blocked')
-        socket.off('tempChange')
-        socket.off('connect')
-        socket.off('init')
-        document.querySelector('.real-time').innerHTML = "Online mode is off"
-      }
-
-
-      
-    })
 
 
 

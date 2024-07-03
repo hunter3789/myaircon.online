@@ -6,12 +6,13 @@ let audioContext;
 let filterNode = null;
 
 document.addEventListener('DOMContentLoaded', (event) => {
+  toggleButton.innerHTML = unmuteIcon;
 
   toggleButton.addEventListener('click', async () => {
       
     if (!audioContext){
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      await audioContext.audioWorklet.addModule('/brown.js');
+      await audioContext.audioWorklet.addModule('./brown.js');
     }
     
       if (isPlaying) {
